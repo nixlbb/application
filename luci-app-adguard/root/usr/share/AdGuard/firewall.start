@@ -1,0 +1,8 @@
+#!/bin/sh
+
+AdGuard_enable=$(uci get AdGuard.AdGuard.enabled)
+redirect=$(uci get AdGuard.AdGuard.redirect)
+
+if [ $AdGuard_enable -eq 1 -a "$redirect" == "redirect" ]; then
+	/etc/init.d/AdGuard do_redirect 1
+fi

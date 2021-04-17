@@ -1,0 +1,12 @@
+#!/bin/sh
+
+uci -q batch <<-EOF >/dev/null 2>&1
+	delete ucitrack.@AdGuard[-1]
+	add ucitrack AdGuard
+	set ucitrack.@AdGuard[-1].init=AdGuard
+	commit ucitrack
+	delete AdGuard.AdGuard.ucitracktest
+EOF
+
+rm -f /tmp/luci-indexcache
+exit 0
