@@ -444,7 +444,7 @@ start_service() {
 	mkdir -p ${binpath%/*}
 	ADDITIONAL_ARGS="$ADDITIONAL_ARGS -c $configpath"
 	ADDITIONAL_ARGS="$ADDITIONAL_ARGS -w $workdir"
-	config_get httpport $CONFIGURATION httpport 3000
+	config_get httpport $CONFIGURATION httpport 3001
 	ADDITIONAL_ARGS="$ADDITIONAL_ARGS -p $httpport"
 
 	# hack to save config file when upgrade system

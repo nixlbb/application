@@ -1,5 +1,5 @@
 bind_host: 192.168.9.1
-bind_port: 3000
+bind_port: 3001
 beta_bind_port: 0
 users:
 - name: root
