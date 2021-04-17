@@ -6,7 +6,7 @@ local fs=require"nixio.fs"
 local uci=require"luci.model.uci".cursor()
 local configpath=uci:get("AdGuardHome","AdGuardHome","configpath") or "/etc/AdGuardHome.yaml"
 local binpath=uci:get("AdGuardHome","AdGuardHome","binpath") or "/usr/bin/AdGuardHome/AdGuardHome"
-httpport=uci:get("AdGuardHome","AdGuardHome","httpport") or "3030"
+httpport=uci:get("AdGuardHome","AdGuardHome","httpport") or "3000"
 m = Map("AdGuardHome", "AdGuard Home")
 m.description = translate("Free and open source, powerful network-wide ads & trackers blocking DNS server.")
 m:section(SimpleSection).template  = "AdGuardHome/AdGuardHome_status"
@@ -20,8 +20,8 @@ o.default = 0
 o.optional = false
 ---- httpport
 o =s:option(Value,"httpport",translate("Browser management port"))
-o.placeholder=3030
-o.default=3030
+o.placeholder=3000
+o.default=3000
 o.datatype="port"
 o.optional = false
 o.description = translate("<input type=\"button\" style=\"width:210px;border-color:Teal; text-align:center;font-weight:bold;color:Green;\" value=\"AdGuardHome Web:"..httpport.."\" onclick=\"window.open('http://'+window.location.hostname+':"..httpport.."/')\"/>")
@@ -37,12 +37,12 @@ else
 	local version=uci:get("AdGuardHome","AdGuardHome","version")
 	local testtime=fs.stat(binpath,"mtime")
 	if testtime~=tonumber(binmtime) or version==nil then
-		local tmp=luci.sys.exec(binpath.." -c /dev/null --check-config 2>&1| grep -m 1 -E '(version |v)[0-9.]+' -o")
-		version=string.sub(tmp, -7)
+		local tmp=luci.sys.exec(binpath.." --version 2>/dev/null | grep -m 1 -E '[0-9]+[.][0-9.]+' -o")
+		version=string.sub(tmp, 1, -2)
 		if version=="" then version="core error" end
 		uci:set("AdGuardHome","AdGuardHome","version",version)
 		uci:set("AdGuardHome","AdGuardHome","binmtime",testtime)
-		uci:save("AdGuardHome")
+		uci:commit("AdGuardHome")
 	end
 	e=version..e
 end
@@ -161,7 +161,12 @@ o = s:option(Flag, "verbose", translate("Verbose log"))
 o.default = 0
 o.optional = true
 ---- gfwlist 
-local a=luci.sys.call("grep -m 1 -q programadd "..configpath)
+local a
+if fs.access(configpath) then
+a=luci.sys.call("grep -m 1 -q programadd "..configpath)
+else
+a=1
+end
 if (a==0) then
 a="Added"
 else
@@ -298,7 +303,7 @@ function m.on_commit(map)
 				uci:set("AdGuardHome","AdGuardHome","ucitracktest","2")
 			end
 		end
-		uci:save("AdGuardHome")
+		uci:commit("AdGuardHome")
 	end
 end
 return m
